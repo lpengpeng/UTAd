@@ -33,6 +33,7 @@ public class AdActivity extends AppCompatActivity {
         myView = (AdView) findViewById(R.id.myView_main);
         myView.setTime(5000, 1000, false);
         myView.goWhere(HomeActivity.class);
+        myView.setJumpButtonBackgound(R.mipmap.jump);
         myView.setMyClick(new AdView.MyCountdownClick() {
             @Override
             public void CountdownClick() {
