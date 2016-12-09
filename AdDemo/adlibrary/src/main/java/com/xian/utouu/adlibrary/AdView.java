@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import java.io.File;
 
 /**
@@ -58,7 +59,6 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     *
      * @param myClick
      */
     public void setMyClick(MyCountdownClick myClick) {
@@ -190,6 +190,10 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         }
     }
 
+    public void setJumpButtonBackgound(int resId) {
+        jumpNext.setBackgroundResource(resId);
+    }
+
     /**
      * 设置播放视频
      *
@@ -205,7 +209,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
                     File sdVideoFile = new File(savePath + "/ad.mp4");
                     if (!sdVideoFile.exists()) {
                         mmr.setDataSource(savePath + "/ad.mp4");
-                    }else {
+                    } else {
                         type = 0;
                         mmr.setDataSource(context, uri);
                     }
