@@ -134,6 +134,9 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         myCountDownTimer.start();
     }
 
+    /**
+     * 取消倒计时
+     */
     public void cancelCountDownTimer() {
         myCountDownTimer.cancel();
     }
@@ -198,6 +201,10 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         jumpNext.setBackgroundResource(resId);
     }
 
+    /**
+     * 设置按钮文字颜色
+     * @param value
+     */
     public void setJumpButtonTextColor(int value) {
         jumpNext.setTextColor(value);
     }
@@ -211,7 +218,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     *
+     *播放视频
      * @param isDownload  是否去下载
      * @param uri  本地raw种视频文件的地址
      * @param type  显示app或者SD卡的标记
