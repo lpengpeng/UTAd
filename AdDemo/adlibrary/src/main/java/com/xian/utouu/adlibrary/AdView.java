@@ -126,12 +126,11 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
      * 设置广告页停留时间
      *
      * @param millisInFuture    总共的停留时间
-     * @param countDownInterval 调用onTick()的间隔
      * @param showTime          是否显示倒计时时间的显示
      */
-    public void setTime(long millisInFuture, long countDownInterval, boolean showTime) {
+    public void setTime(long millisInFuture, boolean showTime) {
         this.isShowTime = showTime;
-        myCountDownTimer = new MyCountDownTimer(millisInFuture, countDownInterval);
+        myCountDownTimer = new MyCountDownTimer(millisInFuture, 1000);
         myCountDownTimer.start();
     }
 
@@ -190,38 +189,51 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         }
     }
 
+    /**
+     * 设置跳转按钮的背景
+     *
+     * @param resId
+     */
     public void setJumpButtonBackgound(int resId) {
         jumpNext.setBackgroundResource(resId);
     }
 
+    public void setJumpButtonTextColor(int value) {
+        jumpNext.setTextColor(value);
+    }
+
     /**
-     * 设置播放视频
+     * 设置按钮的参数
+     * @param params
+     */
+    public void setJumpButtonParams(RelativeLayout.LayoutParams params) {
+        jumpNext.setLayoutParams(params);
+    }
+
+    /**
      *
-     * @param uri 本地视频的地址
+     * @param isDownload  是否去下载
+     * @param uri  本地raw种视频文件的地址
+     * @param type  显示app或者SD卡的标记
+     * @param videoDownloadUrl 更新视频的地址
+     * @param savePath 视频保存在SD卡中的路径
      */
     public void playVideo(boolean isDownload, Uri uri, int type, String videoDownloadUrl, String savePath) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         if (type == 1) {
             File file = new File(savePath);
-            if (file.exists()) {
-                File videoFile = new File(file, "/ad.mp4");
-                if (videoFile.exists()) {
+                if (file.exists()) {
                     File sdVideoFile = new File(savePath + "/ad.mp4");
-                    if (!sdVideoFile.exists()) {
+                    if (sdVideoFile.exists()) {
                         mmr.setDataSource(savePath + "/ad.mp4");
                     } else {
                         type = 0;
                         mmr.setDataSource(context, uri);
                     }
-
                 } else {
                     type = 0;
                     mmr.setDataSource(context, uri);
                 }
-            } else {
-                type = 0;
-                mmr.setDataSource(context, uri);
-            }
         } else {
             mmr.setDataSource(context, uri);
         }
@@ -241,6 +253,9 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
 
     /**
      * 显示图片
+     * @param isDownload  是否需要下载新的数据
+     * @param resId   app资源文件的的id
+     * @param imageUrl 下载的链接
      */
     public void showImage(boolean isDownload, int resId, String imageUrl) {
         customeImageView.init(resId);
@@ -254,8 +269,11 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
 
     /**
      * 展示gif图片
-     *
-     * @param resId 动图的id
+     * @param isDownload 是否去更新数据
+     * @param type 显示的gif类型
+     * @param resId app中的资源
+     * @param gifDownLoadUrl gif的下载地址
+     * @param savePath 保存在SD卡中的路径
      */
     public void showGif(boolean isDownload, int type, int resId, String gifDownLoadUrl, String savePath) {
         gif.setVisibility(VISIBLE);
