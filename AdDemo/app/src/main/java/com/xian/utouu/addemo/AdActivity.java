@@ -106,19 +106,21 @@ public class AdActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onPause() {
         //停止视频的播放
-//        myView.stopVideo();
+        myView.stopVideo();
         super.onPause();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        //这块可以根据具体需求去做下面的代码是 跳转到例如浏览器然后返回的时候让
+        //如果点击了广告还要返回，可以在这里调用
         myView.resumeVideo();
+
+        /*********************下面为一种情况***********************/
+// 停留一秒钟然后跳到主页
 //        myView.playVideo(isDownLoad, uri, type, videoUrl);
 //        myView.postDelayed(new Runnable() {
 //            @Override
