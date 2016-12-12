@@ -13,8 +13,8 @@ public class AdActivity extends AppCompatActivity {
     private int type;
     private boolean isDownLoad = true;//是否需要去更新数据
     private String videoUrl = "http://www.51hfzs.cn/123.mp4"; //视频的下载地址
-    private String gifUrl = "http://photo.l99.com/bigger/00/1425373097998_utt83i.gif";//gif的下载地址
-    private String imageUrl = "http://www.51hfzs.cn/data.json";//图片下载地址
+    private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";//gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
+    private String imageUrl = "http://www.51hfzs.cn/data.json";//图片的请求地址  先返回json 数据里面包含了链接
     private Uri uri;
     private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo"; // 视频和gif在SD卡中的目录
 
@@ -79,29 +79,13 @@ public class AdActivity extends AppCompatActivity {
         //根据服务器的返回数据跳转显示对应的广告，同时传入是否更新数据的标记(isDownLoad),并传入下载链接（imageUrl）
         switch (which) {
             case 1:
-                // @param isDownload  是否需要下载新的数据
-                // @param R.mipmap.welcome   app资源文件的的id
-                // @param imageUrl 下载的链接
-                //该图片保存在应用缓存文件中 不用传路径
-                myView.showImage(isDownLoad, R.mipmap.welcome, imageUrl);
+                    myView.showImage(R.mipmap.welcome, "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg");
                 break;
             case 2:
-                //显示视频
-                // @param isDownload 是否去更新数据
-                // @param uri  本地raw种视频文件的地址
-                // @param type  显示app或者SD卡的标记
-                // @param videoUrl 更新视频的地址
-                // @param sdpath 视频保存在SD卡中的路径
-                myView.playVideo(isDownLoad, uri, type, videoUrl, sdpath);
+                    myView.playVideo(true, uri, videoUrl, sdpath);
                 break;
             case 3:
-                //显示gif
-                // @param isDownload 是否去更新数据
-                // @param type 显示的gif类型
-                // @param R.raw.hh app中raw文件下的资源
-                // @param gifUrl gif的下载地址
-                // @param sdpath 保存在SD卡中的路径
-                myView.showGif(isDownLoad, type, R.raw.hh, gifUrl, sdpath);
+                    myView.showGif(true,R.raw.hh, gifUrl, sdpath);
                 break;
         }
     }
