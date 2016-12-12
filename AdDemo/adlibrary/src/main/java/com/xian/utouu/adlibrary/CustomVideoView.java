@@ -3,7 +3,6 @@ package com.xian.utouu.adlibrary;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.VideoView;
@@ -18,8 +17,6 @@ import java.io.File;
 public class CustomVideoView extends VideoView {
     private File videoFile;
     private Context context;
-
-    private File saveVideofile;
 
     public CustomVideoView(Context context) {
         super(context);
@@ -53,41 +50,20 @@ public class CustomVideoView extends VideoView {
      *
      * @param uri 播放地址
      */
-    public void playVideo(Uri uri, int type, String downLoadUrl,String savePath) {
-        videoFile = new File(savePath);
+    public void playVideo(Uri uri, int type,File file) {
         Uri videoUri = null;
         switch (type) {
             case 0:
                 videoUri = uri;
-                saveVideofile = new File(videoFile, "ad.mp4");
                 break;
             case 1:
-                if (!SdUtils.ExistSDCard(context)) {
-                    videoUri = uri;
-                } else {
-                    if (!videoFile.exists()) {
-                        videoUri = uri;
-                        videoFile.mkdir();
-                        saveVideofile = new File(videoFile, "ad.mp4");
-                    } else {
-                        saveVideofile = new File(videoFile, "ad.mp4");
-                        if (!saveVideofile.exists()) {
-
-                        } else {
-                            videoUri = Uri.fromFile(saveVideofile);
-                        }
-                    }
-                }
+                videoUri = Uri.fromFile(file);
                 break;
         }
-
         // 设置播放路径
         setVideoURI(videoUri);
         //开始播放
         start();
-        if (!TextUtils.isEmpty(downLoadUrl)) {//对字符串进行判断，如果不为空的话就去下载新的视频保存到本地
-            HttpTool.downLoadFromUrl(downLoadUrl, saveVideofile);
-        }
         setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
                                @Override

@@ -3,14 +3,12 @@ package com.xian.utouu.adlibrary;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.text.TextUtils;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
+
 /**
  * Create by 李俊鹏 on 2016/12/7 9:59
  * Function： 1.app广告有一张广告图。
@@ -21,84 +19,65 @@ import java.io.File;
 
 public class CustomeImageView extends ImageView {
     private Context context;
-    private static final String WELCOME_IMAGE_NAME = "welcome_image.jpg";
+    private String path;
     private static File imageFile;
-    private String sourceUrl;
-    public void setSource(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
-        loadRemoteImageInfo();
-    }
 
     public CustomeImageView(Context context) {
         this(context, null);
         this.context = context;
-        imageFile = new File(context.getCacheDir(), WELCOME_IMAGE_NAME);
+
     }
 
     public CustomeImageView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
         this.context = context;
-        imageFile = new File(context.getCacheDir(), WELCOME_IMAGE_NAME);
     }
 
     public CustomeImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initAttrs(attrs);
         this.context = context;
-        imageFile = new File(context.getCacheDir(), WELCOME_IMAGE_NAME);
     }
 
-    private void initAttrs(AttributeSet attrs) {
-
-    }
-
-    public void init(int resId) {
-        loadLocalImage(resId);
-    }
-
-    /**
-     * 必须初始化时调
-     */
-    private void loadLocalImage(int resId) {
-        if (imageFile == null || !imageFile.exists()) {
-            setBackgroundResource(resId);
-            return;
+    public void showImage(int resId, String downLoadUrl) {
+        int type;
+        String showPath = getSavePath(downLoadUrl);
+        imageFile = new File(context.getCacheDir(), showPath);
+        if (imageFile.exists()) {
+            type = 1;
+        } else {
+            type = 0;
         }
-        Bitmap bmpDefaultPic = BitmapFactory.decodeFile(
-                imageFile.getPath(), null);
-        if (bmpDefaultPic != null) {
-            setImageBitmap(bmpDefaultPic);
-        }
-    }
-
-    private void loadRemoteImageInfo() {
-        if (TextUtils.isEmpty(sourceUrl)) {
-            return;
-        }
-        HttpTool.sendGetRequest(sourceUrl, new HttpTool.HttpCallbackListener() {
-            @Override
-            public void onFinish(String reslut) {
-                try {
-                    JSONObject jsonObject = new JSONObject(reslut);
-                    String image = jsonObject.getString("image");
-                    download(image);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        switch (type) {
+            case 0://显示APP本地图片
+                setBackgroundResource(resId);
+                download(downLoadUrl, showPath);
+                break;
+            case 1://显示d缓存目录图片
+                Bitmap bmpDefaultPic = BitmapFactory.decodeFile(
+                        imageFile.getPath(), null);
+                if (bmpDefaultPic != null) {
+                    setImageBitmap(bmpDefaultPic);
                 }
-            }
-
-            @Override
-            public void onError(Exception e) {
-
-            }
-        });
+                break;
+        }
     }
 
-    private void download(String url) {
+    @NonNull
+    private String getSavePath(String downLoadUrl) {
+        String showPath = "";
+        if (downLoadUrl.endsWith(".jpg")) {
+            showPath = MD5Util.md5(downLoadUrl) + ".jpg";
+        } else if (downLoadUrl.endsWith(".png")) {
+            showPath = MD5Util.md5(downLoadUrl) + ".png";
+        }
+        return showPath;
+    }
+
+    private void download(String url, String path) {
         if (url == null) {
             return;
         }
-        imageFile = new File(context.getCacheDir(), WELCOME_IMAGE_NAME);
+        imageFile = new File(context.getCacheDir(), path);
         HttpTool.downLoadFromUrl(url, imageFile);
     }
 }
