@@ -222,12 +222,11 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     /**
      * 播放视频
      *
-     * @param isDownload       是否去下载
      * @param uri              本地raw种视频文件的地址
      * @param videoDownloadUrl 更新视频的地址
      * @param savePath         视频保存在SD卡中的路径
      */
-    public void playVideo(boolean isDownload, Uri uri, String videoDownloadUrl, String savePath) {
+    public void playVideo(Uri uri, String videoDownloadUrl, String savePath) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         File file = null;
         String path = "";
@@ -284,12 +283,11 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     /**
      * 展示gif图片
      *
-     * @param isDownload     是否去更新数据
      * @param resId          app中的资源
      * @param gifDownLoadUrl gif的下载地址
      * @param savePath       保存在SD卡中的路径
      */
-    public void showGif(boolean isDownload, int resId, String gifDownLoadUrl, String savePath) {
+    public void showGif( int resId, String gifDownLoadUrl, String savePath) {
         gif.setVisibility(VISIBLE);
         flVideoView.setVisibility(GONE);
         customeImageView.setVisibility(GONE);
