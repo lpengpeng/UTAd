@@ -14,7 +14,7 @@ public class AdActivity extends AppCompatActivity {
     private boolean isDownLoad = true;//是否需要去更新数据
     private String videoUrl = "http://www.51hfzs.cn/123.mp4"; //视频的下载地址
     private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";//gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
-    private String imageUrl = "http://www.51hfzs.cn/data.json";//图片的请求地址  先返回json 数据里面包含了链接
+    private String imageUrl = "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg";//图片的请求地址  先返回json 数据里面包含了链接
     private Uri uri;
     private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo"; // 视频和gif在SD卡中的目录
 
@@ -26,13 +26,10 @@ public class AdActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        //服务器需要返回的数据为 1.是否需要更新数据的标记 isDownLoad  2. 视频、图片、gif 的下载地址 3.SD卡的保存目录  4.显示哪种类型的广告 ，5 显示APP资源目录还是Sd卡中的标记
+        //服务器需要返回的数据为  1. 视频、图片、gif 的下载（显示）地址 2.显示哪种类型的广告
 
-        //调用服务器的接口获取显示那种类型的广告
+        //调用服务器的接口获取显示那种类型的广告，这里是只是做演示从上个界面传递过来的
         int which = getIntent().getIntExtra("which", 0);
-
-        //调用服务器获取该类型下的App中还是SD卡中的
-        type = getIntent().getIntExtra("type", 0);
 
         //获取本地视频的路径
         String localVideo = "android.resource://" + this.getPackageName() + "/" + R.raw.guide_1;
@@ -62,6 +59,7 @@ public class AdActivity extends AppCompatActivity {
             public void CountdownClick() {
                 myView.cancelCountDownTimer();
                 startActivity(new Intent(AdActivity.this, HomeActivity.class));
+                finish();
             }
         });
 
@@ -76,16 +74,18 @@ public class AdActivity extends AppCompatActivity {
             }
         });
 
-        //根据服务器的返回数据跳转显示对应的广告，同时传入是否更新数据的标记(isDownLoad),并传入下载链接（imageUrl）
         switch (which) {
             case 1:
-                    myView.showImage(R.mipmap.welcome, "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg");
+                // * R.mipmap.welcome   app资源文件的的id    * imageUrl  下载的链接
+                myView.showImage(R.mipmap.welcome, imageUrl);
                 break;
             case 2:
-                    myView.playVideo(true, uri, videoUrl, sdpath);
+                // *  uri 本地raw种视频文件的地址 *  videoUrl 更新视频的地址 * sdpath   视频保存在SD卡中的路径
+                    myView.playVideo( uri, videoUrl, sdpath);
                 break;
             case 3:
-                    myView.showGif(true,R.raw.hh, gifUrl, sdpath);
+                //  * R.raw.hh app中的资源  * gifUrl gif的下载地址 * sdpath   保存在SD卡中的路径
+                    myView.showGif(R.raw.hh, gifUrl, sdpath);
                 break;
         }
     }
