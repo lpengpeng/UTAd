@@ -35,26 +35,4 @@
         android:background="@null"
         android:text="gif" />
 
-    <Button
-        android:text="sd卡视频"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:layout_alignTop="@+id/btn_video"
-        android:layout_toRightOf="@+id/btn_video"
-        android:layout_toEndOf="@+id/btn_video"
-        android:layout_marginLeft="77dp"
-        android:layout_marginStart="77dp"
-        android:id="@+id/button4" />
-
-    <Button
-        android:text="sd卡Gif"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/btn_gif"
-        android:layout_alignLeft="@+id/button4"
-        android:background="@null"
-        android:layout_alignStart="@+id/button4"
-        android:id="@+id/button5" />
-
 </RelativeLayout>

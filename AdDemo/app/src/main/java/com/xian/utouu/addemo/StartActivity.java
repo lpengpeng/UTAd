@@ -36,24 +36,7 @@ public class StartActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(StartActivity.this, AdActivity.class);
-                intent.putExtra("which", 2);
-                intent.putExtra("type", 1);
-                startActivity(intent);
-            }
-        });
-        findViewById(R.id.button5).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(StartActivity.this, AdActivity.class);
-                intent.putExtra("which", 3);
-                intent.putExtra("type", 1);
-                startActivity(intent);
-            }
-        });
+
     }
 
 
