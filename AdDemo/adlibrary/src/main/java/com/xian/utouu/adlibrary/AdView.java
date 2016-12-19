@@ -222,8 +222,8 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     * 播放视频
-     *
+     * 播放本地视频
+     * @param file
      */
     public void playVideo(File file) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -239,8 +239,8 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     * 显示图片
-     *
+     * 显示本地图片
+     * @param file
      */
     public void showImage(File file) {
         customeImageView.setVisibility(VISIBLE);
@@ -249,9 +249,11 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         customeImageView.setBackground(drawable);
         flVideoView.setVisibility(GONE);
         gif.setVisibility(GONE);
-    }    /**
-     * 显示图片
-     *
+    }
+
+    /**
+     * 显示资源文件图片
+     * @param resId
      */
     public void showImage(int resId) {
         customeImageView.setVisibility(VISIBLE);
@@ -261,8 +263,8 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     * 展示gif图片
-     *
+     * 显示gif图片
+     * @param file
      */
     public void showGif(File file) {
         gif.setVisibility(VISIBLE);

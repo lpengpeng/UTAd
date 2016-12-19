@@ -87,11 +87,11 @@ public class AdActivity extends AppCompatActivity {
                             //设置倒计时的时间和是否显示几秒。false 为不显示
                             myView.setTime(5000, false);
                             if (url.endsWith(".gif")) {
-                                myView.showGif(file);
+                                myView.showGif(file);//显示gif
                             } else if (url.endsWith(".jpg") || url.endsWith(".png")) {
-                                myView.showImage(file);
+                                myView.showImage(file);//显示图片
                             } else {
-                                myView.playVideo(file);
+                                myView.playVideo(file);//显示视频
                             }
                         }
                     });
