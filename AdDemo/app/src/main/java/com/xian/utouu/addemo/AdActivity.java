@@ -8,9 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.xian.utouu.adlibrary.AdView;
 import com.xian.utouu.adlibrary.HttpTool;
-import com.xian.utouu.adlibrary.SdUtils;
 
-import java.io.File;
+import static java.lang.Thread.sleep;
 
 public class AdActivity extends AppCompatActivity {
     private AdView myView;
@@ -44,10 +43,10 @@ public class AdActivity extends AppCompatActivity {
         myView.setJumpButtonBackgound(R.mipmap.jump);
 
         //设置跳转按钮的字体颜色
-        myView.setJumpButtonTextColor(0xf16060);
+        myView.setJumpButtonTextColor(0xfff16060);
 
         //设置按钮的位置的参数
-        myView.setJumpButtonParams(null);
+//        myView.setJumpButtonParams(null);
 
         //设置跳转按钮的点击事件
         myView.setMyClick(new AdView.MyCountdownClick() {
@@ -70,39 +69,26 @@ public class AdActivity extends AppCompatActivity {
                 myView.cancelCountDownTimer();//取消掉倒计时的事件
             }
         });
-        if (SdUtils.ExistSDCard(this)) {
-            File file = new File(sdpath);
-            if (!file.exists()) {
-                file.mkdir();
-            }
-            HttpTool.downLoadFromUrl(url, file, new HttpTool.HttpDownLoadListener() {
-                @Override
-                public void onFinish(final File file) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            //设置倒计时的时间和是否显示几秒。false 为不显示
-                            myView.setTime(5000, false);
-                            if (url.endsWith(".gif")) {
-                                myView.showGif(file);//显示gif
-                            } else if (url.endsWith(".jpg") || url.endsWith(".png")) {
-                                myView.showImage(file);//显示图片
-                            } else {
-                                myView.playVideo(file);//显示视频
-                            }
-                        }
-                    });
-                }
+        myView.setTime(5000);//设置倒计时时间
+        //根据url显示加载哪种类型广高
+        myView.showView(this, sdpath, url, new HttpTool.HttpdwonLoadFail() {
+            @Override
+            public void fail() {
+                new Thread(new Runnable() {
 
-                @Override
-                public void onError(Exception e) {
-                    //直接跳过界面
-                    startActivity(new Intent(AdActivity.this, HomeActivity.class));
-                }
-            });
-        } else {
-            //直接跳过界面
-            startActivity(new Intent(AdActivity.this, HomeActivity.class));
-        }
+                    public void run() {
+                        try {
+                            sleep(2000);
+                            startActivity(new Intent(AdActivity.this, HomeActivity.class));
+                            finish();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.xian.utouu.adlibrary;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -38,6 +39,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     private FrameLayout flVideoView;
     private ImageView flImage;
     private boolean isShowTime;
+    private int time;
 
     public AdView(Context context) {
         this(context, null);
@@ -128,7 +130,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
      * @param millisInFuture 总共的停留时间
      * @param showTime       是否显示倒计时时间的显示
      */
-    public void setTime(long millisInFuture, boolean showTime) {
+    public void setProperty(long millisInFuture, boolean showTime) {
         this.isShowTime = showTime;
         myCountDownTimer = new MyCountDownTimer(millisInFuture, 1000);
         myCountDownTimer.start();
@@ -140,7 +142,9 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
      * 取消倒计时
      */
     public void cancelCountDownTimer() {
-        myCountDownTimer.cancel();
+        if (myCountDownTimer != null) {
+            myCountDownTimer.cancel();
+        }
     }
 
     @Override
@@ -218,11 +222,14 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
      * @param params
      */
     public void setJumpButtonParams(ViewGroup.LayoutParams params) {
-        jumpNext.setLayoutParams(params);
+        if (params != null) {
+            jumpNext.setLayoutParams(params);
+        }
     }
 
     /**
      * 播放本地视频
+     *
      * @param file
      */
     public void playVideo(File file) {
@@ -240,6 +247,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
 
     /**
      * 显示本地图片
+     *
      * @param file
      */
     public void showImage(File file) {
@@ -253,6 +261,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
 
     /**
      * 显示资源文件图片
+     *
      * @param resId
      */
     public void showImage(int resId) {
@@ -263,7 +272,16 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
+     * 设置倒计时时间
+     * @param time
+     */
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    /**
      * 显示gif图片
+     *
      * @param file
      */
     public void showGif(File file) {
@@ -271,5 +289,75 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         flVideoView.setVisibility(GONE);
         customeImageView.setVisibility(GONE);
         gif.showGif(file);
+    }
+
+    /**
+     * 显示不同的view
+     *
+     * @param mActivity   引用view的activity
+     * @param sdpath      SD卡的路径
+     * @param downLoadUrl 下载路径
+     * @param listener    下载监听
+     */
+    public void showView(final Activity mActivity, String sdpath, final String downLoadUrl, final HttpTool.HttpdwonLoadFail listener) {
+        String localUrl = "";
+        localUrl = getMd5String(downLoadUrl, localUrl);
+        File localFile = new File(sdpath, localUrl);
+        if (localFile.exists()) {
+            setProperty(time, false);
+            if (downLoadUrl.endsWith(".gif")) {
+                showGif(localFile);//显示gif
+            } else if (downLoadUrl.endsWith(".jpg") || downLoadUrl.endsWith(".png")) {
+                showImage(localFile);//显示图片
+            } else {
+                playVideo(localFile);//显示视频
+            }
+        } else {
+            //判断Sd卡是否存在
+            if (SdUtils.ExistSDCard(context)) {
+                File file = new File(sdpath);
+                if (!file.exists()) {
+                    file.mkdir();
+                }
+                String saveUrl = getMd5String(downLoadUrl, localUrl);
+                File saveFile = new File(file, saveUrl);
+                //下载相应的广告
+                HttpTool.downLoadFromUrl(downLoadUrl, saveFile, listener, new HttpTool.HttpDownLoadListener() {
+                    @Override
+                    public void onFinish(final File file) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            public void run() {
+                                //设置倒计时的时间和是否显示几秒。false 为不显示
+                                setProperty(time, false);
+                                if (downLoadUrl.endsWith(".gif")) {
+                                    showGif(file);//显示gif
+                                } else if (downLoadUrl.endsWith(".jpg") || downLoadUrl.endsWith(".png")) {
+                                    showImage(file);//显示图片
+                                } else {
+                                    playVideo(file);//显示视频
+                                }
+                            }
+                        });
+                    }
+                });
+            } else {
+                listener.fail();
+            }
+        }
+    }
+
+    private String getMd5String(String downLoadUrl, String saveUrl) {
+        if (downLoadUrl.endsWith(".gif")) {
+            saveUrl = MD5Util.md5(downLoadUrl) + ".gif";
+        } else if (downLoadUrl.endsWith(".jpg")) {
+            saveUrl = MD5Util.md5(downLoadUrl) + ".jpg";
+        } else if (downLoadUrl.endsWith(".png")) {
+            saveUrl = MD5Util.md5(downLoadUrl) + ".png";
+        } else if (downLoadUrl.endsWith(".mp4")) {
+            saveUrl = MD5Util.md5(downLoadUrl) + ".mp4";
+        } else if (downLoadUrl.endsWith(".3gp")) {
+            saveUrl = MD5Util.md5(downLoadUrl) + ".3gp";
+        }
+        return saveUrl;
     }
 }

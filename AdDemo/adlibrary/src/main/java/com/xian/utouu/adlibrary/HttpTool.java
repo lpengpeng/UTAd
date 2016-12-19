@@ -21,27 +21,13 @@ public class HttpTool {
     /**
      * 从网络Url中下载文件
      */
-    public static void downLoadFromUrl(final String downLoadUrl,final File file ,final HttpDownLoadListener  listener) {
+    public static void downLoadFromUrl(final String downLoadUrl,final File file ,final HttpdwonLoadFail downLoadFail,final HttpDownLoadListener  listener) {
         new Thread(new Runnable() {
 
             @Override
             public void run() {
                 HttpURLConnection conn = null;
                 try {
-
-                    String saveUrl="";
-                    if (downLoadUrl.endsWith(".gif")) {
-                        saveUrl = MD5Util.md5(downLoadUrl) + ".gif";
-                    } else if (downLoadUrl.endsWith(".jpg")) {
-                        saveUrl = MD5Util.md5(downLoadUrl) + ".jpg";
-                    } else if (downLoadUrl.endsWith(".png")) {
-                        saveUrl = MD5Util.md5(downLoadUrl) + ".png";
-                    } else if (downLoadUrl.endsWith(".mp4")) {
-                        saveUrl = MD5Util.md5(downLoadUrl) + ".mp4";
-                    }else if (downLoadUrl.endsWith(".3gp")) {
-                        saveUrl = MD5Util.md5(downLoadUrl) + ".3gp";
-                    }
-                    File saveFile = new File(file, saveUrl);
                     URL url = new URL(downLoadUrl);
                     conn = (HttpURLConnection) url.openConnection();
                     //设置超时间为5秒
@@ -52,16 +38,16 @@ public class HttpTool {
                     InputStream inputStream = conn.getInputStream();
                     //获取自己数组
                     byte[] getData = readInputStream(inputStream);
-                    FileOutputStream fos = new FileOutputStream(saveFile);
+                    FileOutputStream fos = new FileOutputStream(file);
                     fos.write(getData);
                     fos.close();
-                    listener.onFinish(saveFile);
+                    listener.onFinish(file);
                     if (inputStream != null) {
                         inputStream.close();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    listener.onError(e);
+                    downLoadFail.fail();
                     if (conn != null) {
                         conn.disconnect();
                     }
@@ -91,6 +77,8 @@ public class HttpTool {
 
     public interface HttpDownLoadListener {
         void onFinish(File file);
-        void onError(Exception e);
+    }
+    public interface HttpdwonLoadFail{
+        void fail();
     }
 }
