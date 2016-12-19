@@ -46,7 +46,7 @@ public class AdActivity extends AppCompatActivity {
         myView.setJumpButtonTextColor(0xfff16060);
 
         //设置按钮的位置的参数
-//        myView.setJumpButtonParams(null);
+        myView.setJumpButtonParams(null);
 
         //设置跳转按钮的点击事件
         myView.setMyClick(new AdView.MyCountdownClick() {
