@@ -13,17 +13,15 @@ import com.xian.utouu.adlibrary.SdUtils;
 import java.io.File;
 
 public class AdActivity extends AppCompatActivity {
-    AdView myView;
-    private int type;
-    private boolean isDownLoad = true;//是否需要去更新数据
+    private AdView myView;
+    //gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
     private String videoUrl = "http://www.51hfzs.cn/123.mp4"; //视频的下载地址
-    private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";//gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
-    private String imageUrl = "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg";//图片的请求地址  先返回json 数据里面包含了链接
-    private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo"; // 视频和gif在SD卡中的目录
-    private File file;
-    private File saveFile;
+    private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";
+    //图片的请求地址  先返回json 数据里面包含了链接
+    private String imageUrl = "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg";
+    // 视频和gif在SD卡中的目录
+    private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo";
     private String url;
-    private String saveUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +31,11 @@ public class AdActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        //服务器需要返回的数据为  1. 视频、图片、gif 的下载（显示）地址 2.显示哪种类型的广告
-
-        //调用服务器的接口获取显示那种类型的广告，这里是只是做演示从上个界面传递过来的
+        //调用接口返回url
         url = getIntent().getStringExtra("url");
 
         //获取控件
         myView = (AdView) findViewById(R.id.myView_main);
-
 
         //设置跳转按钮
         myView.goWhere(HomeActivity.class);
@@ -49,7 +44,7 @@ public class AdActivity extends AppCompatActivity {
         myView.setJumpButtonBackgound(R.mipmap.jump);
 
         //设置跳转按钮的字体颜色
-//        myView.setJumpButtonTextColor(0xf16060);
+        myView.setJumpButtonTextColor(0xf16060);
 
         //设置按钮的位置的参数
         myView.setJumpButtonParams(null);
@@ -60,9 +55,10 @@ public class AdActivity extends AppCompatActivity {
             public void CountdownClick() {
                 myView.cancelCountDownTimer();
                 startActivity(new Intent(AdActivity.this, HomeActivity.class));
-//                finish();
+                finish();
             }
         });
+        //设置默认的图片
         myView.showImage(R.mipmap.ic_launcher);
         //设置广告本身的点击事件
         myView.setMyImageClick(new AdView.MyAdClick() {
@@ -100,10 +96,12 @@ public class AdActivity extends AppCompatActivity {
                 @Override
                 public void onError(Exception e) {
                     //直接跳过界面
+                    startActivity(new Intent(AdActivity.this, HomeActivity.class));
                 }
             });
         } else {
             //直接跳过界面
+            startActivity(new Intent(AdActivity.this, HomeActivity.class));
         }
     }
 
