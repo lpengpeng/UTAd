@@ -3,13 +3,14 @@ package com.xian.utouu.adlibrary;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.CountDownTimer;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -24,7 +25,7 @@ import java.io.File;
  */
 
 public class AdView extends RelativeLayout implements View.OnClickListener {
-    private CustomeImageView customeImageView;
+    private ImageView customeImageView;
     private Button jumpNext;
     private Class goActivity;
     private Context context;
@@ -100,14 +101,13 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
 
     private void initView(Context context) {
         View.inflate(context, R.layout.my_view, this);
-        customeImageView = (CustomeImageView) findViewById(R.id.iv_ad);
+        customeImageView = (ImageView) findViewById(R.id.iv_ad);
         rlGowhere = (RelativeLayout) findViewById(R.id.rl_gowhere);
         flVideoView = (FrameLayout) findViewById(R.id.fl_vv);
         jumpNext = (Button) findViewById(R.id.bt_time);
         customVideoView = (CustomVideoView) findViewById(R.id.vv_ad);
         flImage = (ImageView) findViewById(R.id.iv_fl);
         jumpNext.setOnClickListener(this);
-        rlGowhere.setOnClickListener(this);
         gif = (CustomerGifView) findViewById(R.id.giv);
         customVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -132,6 +132,8 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         this.isShowTime = showTime;
         myCountDownTimer = new MyCountDownTimer(millisInFuture, 1000);
         myCountDownTimer.start();
+        jumpNext.setVisibility(View.VISIBLE);
+        rlGowhere.setOnClickListener(this);
     }
 
     /**
@@ -215,48 +217,17 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
      *
      * @param params
      */
-    public void setJumpButtonParams(RelativeLayout.LayoutParams params) {
+    public void setJumpButtonParams(ViewGroup.LayoutParams params) {
         jumpNext.setLayoutParams(params);
     }
 
     /**
      * 播放视频
      *
-     * @param uri              本地raw种视频文件的地址
-     * @param videoDownloadUrl 更新视频的地址
-     * @param savePath         视频保存在SD卡中的路径
      */
-    public void playVideo(Uri uri, String videoDownloadUrl, String savePath) {
+    public void playVideo(File file) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        File file = null;
-        String path = "";
-        int type = 0;
-        if (videoDownloadUrl.endsWith(".mp4")) {
-            path = savePath + "/" + MD5Util.md5(path) + ".mp4";
-            file = new File(path);
-            if (file.exists()) {
-                type = 1;
-            } else {
-                type = 0;
-            }
-        }
-        if (type == 1) {
-            mmr.setDataSource(path);
-        } else {
-            mmr.setDataSource(context, uri);
-            if (!TextUtils.isEmpty(videoDownloadUrl)) {//对字符串进行判断，如果不为空的话就去下载新的视频保存到本地
-                if (!SdUtils.ExistSDCard(context)) {
-
-                } else {
-                    File saveFile = new File(savePath);
-                    FileUtils.deldetFile(saveFile, ".mp4");
-                    if (!saveFile.exists()) {
-                        saveFile.mkdir();
-                    }
-                    HttpTool.downLoadFromUrl(videoDownloadUrl, file);
-                }
-            }
-        }
+        mmr.setDataSource(file.getPath());
         Bitmap bitmap = mmr.getFrameAtTime(0);
         flImage.setImageBitmap(bitmap);
         mmr.release();
@@ -264,18 +235,27 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         customVideoView.setVisibility(View.VISIBLE);
         customeImageView.setVisibility(GONE);
         gif.setVisibility(GONE);
-        customVideoView.playVideo(uri, type, file);
+        customVideoView.playVideo(file);
     }
 
     /**
      * 显示图片
      *
-     * @param resId    app资源文件的的id
-     * @param imageUrl 下载的链接
      */
-    public void showImage(int resId, String imageUrl) {
-        customeImageView.showImage(resId, imageUrl);
+    public void showImage(File file) {
         customeImageView.setVisibility(VISIBLE);
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
+        BitmapDrawable drawable = new BitmapDrawable(bitmap);
+        customeImageView.setBackground(drawable);
+        flVideoView.setVisibility(GONE);
+        gif.setVisibility(GONE);
+    }    /**
+     * 显示图片
+     *
+     */
+    public void showImage(int resId) {
+        customeImageView.setVisibility(VISIBLE);
+        customeImageView.setBackgroundResource(resId);
         flVideoView.setVisibility(GONE);
         gif.setVisibility(GONE);
     }
@@ -283,42 +263,11 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     /**
      * 展示gif图片
      *
-     * @param resId          app中的资源
-     * @param gifDownLoadUrl gif的下载地址
-     * @param savePath       保存在SD卡中的路径
      */
-    public void showGif( int resId, String gifDownLoadUrl, String savePath) {
+    public void showGif(File file) {
         gif.setVisibility(VISIBLE);
         flVideoView.setVisibility(GONE);
         customeImageView.setVisibility(GONE);
-        String path = "";
-        File file = null;
-        int type = 0;
-        if (gifDownLoadUrl.endsWith(".gif")) {
-            path = savePath + "/" + MD5Util.md5(gifDownLoadUrl) + ".gif";
-            file = new File(path);
-            if (file.exists()) {
-                type = 1;
-            }else {
-                type = 0;
-            }
-        }
-        if (type == 1) {
-            gif.showGif(type, 0, file);
-        } else {
-            gif.showGif(type, resId, null);
-            if (!TextUtils.isEmpty(gifDownLoadUrl)) {//对字符串进行判断，如果不为空的话就去下载新的视频保存到本地
-                if (!SdUtils.ExistSDCard(context)) {
-
-                } else {
-                    File saveFile = new File(savePath);
-                    FileUtils.deldetFile(saveFile, ".gif");
-                    if (!saveFile.exists()) {
-                        saveFile.mkdir();
-                    }
-                    HttpTool.downLoadFromUrl(gifDownLoadUrl, file);
-                }
-            }
-        }
+        gif.showGif(file);
     }
 }

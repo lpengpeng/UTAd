@@ -37,24 +37,15 @@ public class CustomerGifView extends GifImageView {
 
     /**
      * 加载gif图片
-     * @param type        显示哪个路径的gif
-     * @param resId       app中raw文件下的gif图片
+     *
      */
-    public void showGif(int type, int resId, File file) {
-        switch (type) {
-            case 0://从App加载
-                if (resId != 0) {
-                    setBackgroundResource(resId);
-                }
-                break;
-            case 1://从sd卡加载
-                try {
-                    GifDrawable drawable = new GifDrawable(file.getPath());
-                    setBackground(drawable);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
+    public void showGif(File file) {
+        try {
+            GifDrawable drawable = new GifDrawable(file.getPath());
+            setBackground(drawable);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 }

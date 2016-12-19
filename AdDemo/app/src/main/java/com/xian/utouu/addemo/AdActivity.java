@@ -7,6 +7,10 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.xian.utouu.adlibrary.AdView;
+import com.xian.utouu.adlibrary.HttpTool;
+import com.xian.utouu.adlibrary.SdUtils;
+
+import java.io.File;
 
 public class AdActivity extends AppCompatActivity {
     AdView myView;
@@ -15,8 +19,11 @@ public class AdActivity extends AppCompatActivity {
     private String videoUrl = "http://www.51hfzs.cn/123.mp4"; //视频的下载地址
     private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";//gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
     private String imageUrl = "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg";//图片的请求地址  先返回json 数据里面包含了链接
-    private Uri uri;
     private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo"; // 视频和gif在SD卡中的目录
+    private File file;
+    private File saveFile;
+    private String url;
+    private String saveUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +36,11 @@ public class AdActivity extends AppCompatActivity {
         //服务器需要返回的数据为  1. 视频、图片、gif 的下载（显示）地址 2.显示哪种类型的广告
 
         //调用服务器的接口获取显示那种类型的广告，这里是只是做演示从上个界面传递过来的
-        int which = getIntent().getIntExtra("which", 0);
-
-        //获取本地视频的路径
-        String localVideo = "android.resource://" + this.getPackageName() + "/" + R.raw.guide_1;
-        uri = Uri.parse(localVideo);
+        url = getIntent().getStringExtra("url");
 
         //获取控件
         myView = (AdView) findViewById(R.id.myView_main);
 
-        //设置倒计时的时间和是否显示几秒。false 为不显示
-        myView.setTime(5000, false);
 
         //设置跳转按钮
         myView.goWhere(HomeActivity.class);
@@ -51,7 +52,7 @@ public class AdActivity extends AppCompatActivity {
 //        myView.setJumpButtonTextColor(0xf16060);
 
         //设置按钮的位置的参数
-//        myView.setJumpButtonParams(null);
+        myView.setJumpButtonParams(null);
 
         //设置跳转按钮的点击事件
         myView.setMyClick(new AdView.MyCountdownClick() {
@@ -59,10 +60,10 @@ public class AdActivity extends AppCompatActivity {
             public void CountdownClick() {
                 myView.cancelCountDownTimer();
                 startActivity(new Intent(AdActivity.this, HomeActivity.class));
-                finish();
+//                finish();
             }
         });
-
+        myView.showImage(R.mipmap.ic_launcher);
         //设置广告本身的点击事件
         myView.setMyImageClick(new AdView.MyAdClick() {
             @Override
@@ -73,20 +74,36 @@ public class AdActivity extends AppCompatActivity {
                 myView.cancelCountDownTimer();//取消掉倒计时的事件
             }
         });
+        if (SdUtils.ExistSDCard(this)) {
+            File file = new File(sdpath);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            HttpTool.downLoadFromUrl(url, file, new HttpTool.HttpDownLoadListener() {
+                @Override
+                public void onFinish(final File file) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            //设置倒计时的时间和是否显示几秒。false 为不显示
+                            myView.setTime(5000, false);
+                            if (url.endsWith(".gif")) {
+                                myView.showGif(file);
+                            } else if (url.endsWith(".jpg") || url.endsWith(".png")) {
+                                myView.showImage(file);
+                            } else {
+                                myView.playVideo(file);
+                            }
+                        }
+                    });
+                }
 
-        switch (which) {
-            case 1:
-                // * R.mipmap.welcome   app资源文件的的id    * imageUrl  下载的链接
-                myView.showImage(R.mipmap.welcome, imageUrl);
-                break;
-            case 2:
-                // *  uri 本地raw种视频文件的地址 *  videoUrl 更新视频的地址 * sdpath   视频保存在SD卡中的路径
-                    myView.playVideo( uri, videoUrl, sdpath);
-                break;
-            case 3:
-                //  * R.raw.hh app中的资源  * gifUrl gif的下载地址 * sdpath   保存在SD卡中的路径
-                    myView.showGif(R.raw.hh, gifUrl, sdpath);
-                break;
+                @Override
+                public void onError(Exception e) {
+                    //直接跳过界面
+                }
+            });
+        } else {
+            //直接跳过界面
         }
     }
 
@@ -102,17 +119,6 @@ public class AdActivity extends AppCompatActivity {
         super.onRestart();
         //如果点击了广告还要返回，可以在这里调用
         myView.resumeVideo();
-
-        /*********************下面为一种情况***********************/
-// 停留一秒钟然后跳到主页
-//        myView.playVideo(isDownLoad, uri, type, videoUrl);
-//        myView.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                finish();
-//                startActivity(new Intent(AdActivity.this, HomeActivity.class));
-//            }
-//        },1000);
     }
 
     @Override

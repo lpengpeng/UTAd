@@ -1,12 +1,10 @@
 package com.xian.utouu.adlibrary;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 /**
@@ -20,55 +18,31 @@ import java.net.URL;
  */
 
 public class HttpTool {
-
-    public static void sendGetRequest(final String address,
-                                      final HttpCallbackListener listener) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection connection = null;
-                try {
-                    URL url = new URL(address);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(4000);
-                    connection.setReadTimeout(4000);
-                    InputStream in = connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    if (listener != null) {
-                        // 回调方法 onFinish()
-                        listener.onFinish(response.toString());
-                    }
-                } catch (Exception e) {
-                    if (listener != null) {
-                        // 回调方法 onError()
-                        listener.onError(e);
-                    }
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-            }
-        }).start();
-    }
-
-
     /**
      * 从网络Url中下载文件
      */
-    public static void downLoadFromUrl(final String urlStr, final File file) {
+    public static void downLoadFromUrl(final String downLoadUrl,final File file ,final HttpDownLoadListener  listener) {
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 HttpURLConnection conn = null;
                 try {
-                    URL url = new URL(urlStr);
+
+                    String saveUrl="";
+                    if (downLoadUrl.endsWith(".gif")) {
+                        saveUrl = MD5Util.md5(downLoadUrl) + ".gif";
+                    } else if (downLoadUrl.endsWith(".jpg")) {
+                        saveUrl = MD5Util.md5(downLoadUrl) + ".jpg";
+                    } else if (downLoadUrl.endsWith(".png")) {
+                        saveUrl = MD5Util.md5(downLoadUrl) + ".png";
+                    } else if (downLoadUrl.endsWith(".mp4")) {
+                        saveUrl = MD5Util.md5(downLoadUrl) + ".mp4";
+                    }else if (downLoadUrl.endsWith(".3gp")) {
+                        saveUrl = MD5Util.md5(downLoadUrl) + ".3gp";
+                    }
+                    File saveFile = new File(file, saveUrl);
+                    URL url = new URL(downLoadUrl);
                     conn = (HttpURLConnection) url.openConnection();
                     //设置超时间为5秒
                     conn.setConnectTimeout(5 * 1000);
@@ -78,14 +52,16 @@ public class HttpTool {
                     InputStream inputStream = conn.getInputStream();
                     //获取自己数组
                     byte[] getData = readInputStream(inputStream);
-                    FileOutputStream fos = new FileOutputStream(file);
+                    FileOutputStream fos = new FileOutputStream(saveFile);
                     fos.write(getData);
                     fos.close();
+                    listener.onFinish(saveFile);
                     if (inputStream != null) {
                         inputStream.close();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    listener.onError(e);
                     if (conn != null) {
                         conn.disconnect();
                     }
@@ -112,8 +88,9 @@ public class HttpTool {
         return bos.toByteArray();
     }
 
-    interface HttpCallbackListener {
-        void onFinish(String result);
+
+    public interface HttpDownLoadListener {
+        void onFinish(File file);
         void onError(Exception e);
     }
 }

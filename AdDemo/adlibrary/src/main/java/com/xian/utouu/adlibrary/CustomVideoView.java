@@ -32,7 +32,6 @@ public class CustomVideoView extends VideoView {
     public CustomVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-//        videoFile = new File(sdpath);
     }
 
     @Override
@@ -48,18 +47,9 @@ public class CustomVideoView extends VideoView {
     /**
      * 播放视频
      *
-     * @param uri 播放地址
      */
-    public void playVideo(Uri uri, int type,File file) {
-        Uri videoUri = null;
-        switch (type) {
-            case 0:
-                videoUri = uri;
-                break;
-            case 1:
-                videoUri = Uri.fromFile(file);
-                break;
-        }
+    public void playVideo(File file) {
+        Uri videoUri = Uri.fromFile(file);
         // 设置播放路径
         setVideoURI(videoUri);
         //开始播放
