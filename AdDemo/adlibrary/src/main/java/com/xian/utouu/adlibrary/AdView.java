@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.view.View;
@@ -28,18 +28,17 @@ import java.io.File;
 public class AdView extends RelativeLayout implements View.OnClickListener {
     private ImageView customeImageView;
     private Button jumpNext;
-    private Class goActivity;
     private Context context;
     private MyCountDownTimer myCountDownTimer;
     private CustomVideoView customVideoView;
     private CustomerGifView gif;
     private MyCountdownClick myClick;
-    private MyAdClick myAdClick;
     private RelativeLayout rlGowhere;
     private FrameLayout flVideoView;
     private ImageView flImage;
     private boolean isShowTime;
-    private int time;
+    private String adUrl;
+    private Class<?> goActivity;
 
     public AdView(Context context) {
         this(context, null);
@@ -49,10 +48,6 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     public AdView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
         this.context = context;
-    }
-
-    public void setMyImageClick(MyAdClick myAdClick) {
-        this.myAdClick = myAdClick;
     }
 
     public AdView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -68,14 +63,6 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
         this.myClick = myClick;
     }
 
-    /**
-     * 设置将要跳转的界面
-     *
-     * @param goActivity 将要跳转到的类
-     */
-    public void goWhere(Class<?> goActivity) {
-        this.goActivity = goActivity;
-    }
 
     /**
      * 暂停视频
@@ -90,15 +77,6 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     public void resumeVideo() {
         customVideoView.resume();
         customVideoView.playVideo();
-    }
-
-    /**
-     * 获取视频当前的位置
-     *
-     * @return
-     */
-    public int getVideogCurrentPosition() {
-        return customVideoView.getCurrentPosition();
     }
 
     private void initView(Context context) {
@@ -154,7 +132,10 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
             myClick.CountdownClick();
             myCountDownTimer.cancel();
         } else if (id == R.id.rl_gowhere) {
-            myAdClick.adClick();
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(adUrl));
+            context.startActivity(i);
+            myCountDownTimer.cancel();
         }
     }
 
@@ -163,13 +144,6 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
      */
     public interface MyCountdownClick {
         void CountdownClick();
-    }
-
-    /**
-     * 广告图片、gif、视频的点击回调
-     */
-    public interface MyAdClick {
-        void adClick();
     }
 
     class MyCountDownTimer extends CountDownTimer {
@@ -253,8 +227,7 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     public void showImage(File file) {
         customeImageView.setVisibility(VISIBLE);
         Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
-        BitmapDrawable drawable = new BitmapDrawable(bitmap);
-        customeImageView.setBackground(drawable);
+        customeImageView.setImageBitmap(bitmap);
         flVideoView.setVisibility(GONE);
         gif.setVisibility(GONE);
     }
@@ -272,14 +245,6 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     * 设置倒计时时间
-     * @param time
-     */
-    public void setTime(int time) {
-        this.time = time;
-    }
-
-    /**
      * 显示gif图片
      *
      * @param file
@@ -292,22 +257,25 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     * 显示不同的view
-     *
-     * @param mActivity   引用view的activity
+     * @param mActivity   显示图片的activity
+     * @param type        显示资源的类型
      * @param sdpath      SD卡的路径
-     * @param downLoadUrl 下载路径
-     * @param listener    下载监听
+     * @param downLoadUrl 下载的链接
+     * @param adUrl       广告的链接
+     * @param time        倒计时时间
+     * @param goActivity  点击按钮后跳转到的界面
      */
-    public void showView(final Activity mActivity, String sdpath, final String downLoadUrl, final HttpTool.HttpdwonLoadFail listener) {
+    public void showView(final Activity mActivity, final int type, String sdpath, final String downLoadUrl, String adUrl, final int time, final Class<?> goActivity) {
+        this.goActivity = goActivity;
+        this.adUrl = adUrl;
         String localUrl = "";
-        localUrl = getMd5String(downLoadUrl, localUrl);
+        localUrl = getMd5String(downLoadUrl, type, localUrl);
         File localFile = new File(sdpath, localUrl);
         if (localFile.exists()) {
             setProperty(time, false);
-            if (downLoadUrl.endsWith(".gif")) {
+            if (type == 2) {
                 showGif(localFile);//显示gif
-            } else if (downLoadUrl.endsWith(".jpg") || downLoadUrl.endsWith(".png")) {
+            } else if (type == 1) {
                 showImage(localFile);//显示图片
             } else {
                 playVideo(localFile);//显示视频
@@ -319,19 +287,21 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
                 if (!file.exists()) {
                     file.mkdir();
                 }
-                String saveUrl = getMd5String(downLoadUrl, localUrl);
+                String saveUrl = "";
+                saveUrl = getMd5String(downLoadUrl, type, saveUrl);
                 File saveFile = new File(file, saveUrl);
                 //下载相应的广告
-                HttpTool.downLoadFromUrl(downLoadUrl, saveFile, listener, new HttpTool.HttpDownLoadListener() {
+                HttpTool.downLoadFromUrl(downLoadUrl, saveFile, new HttpTool.HttpDownLoadListener() {
+
                     @Override
-                    public void onFinish(final File file) {
+                    public void onSuccess(final File file) {
                         mActivity.runOnUiThread(new Runnable() {
                             public void run() {
                                 //设置倒计时的时间和是否显示几秒。false 为不显示
                                 setProperty(time, false);
-                                if (downLoadUrl.endsWith(".gif")) {
+                                if (type == 2) {
                                     showGif(file);//显示gif
-                                } else if (downLoadUrl.endsWith(".jpg") || downLoadUrl.endsWith(".png")) {
+                                } else if (type == 1) {
                                     showImage(file);//显示图片
                                 } else {
                                     playVideo(file);//显示视频
@@ -339,24 +309,25 @@ public class AdView extends RelativeLayout implements View.OnClickListener {
                             }
                         });
                     }
+
+                    @Override
+                    public void onFailure() {
+                        context.startActivity(new Intent(context, goActivity));
+                    }
+
                 });
-            } else {
-                listener.fail();
             }
         }
     }
 
-    private String getMd5String(String downLoadUrl, String saveUrl) {
-        if (downLoadUrl.endsWith(".gif")) {
+
+    private String getMd5String(String downLoadUrl, int type, String saveUrl) {
+        if (type == 2) {
             saveUrl = MD5Util.md5(downLoadUrl) + ".gif";
-        } else if (downLoadUrl.endsWith(".jpg")) {
+        } else if (type == 1) {
             saveUrl = MD5Util.md5(downLoadUrl) + ".jpg";
-        } else if (downLoadUrl.endsWith(".png")) {
-            saveUrl = MD5Util.md5(downLoadUrl) + ".png";
-        } else if (downLoadUrl.endsWith(".mp4")) {
+        } else if (type == 3) {
             saveUrl = MD5Util.md5(downLoadUrl) + ".mp4";
-        } else if (downLoadUrl.endsWith(".3gp")) {
-            saveUrl = MD5Util.md5(downLoadUrl) + ".3gp";
         }
         return saveUrl;
     }

@@ -21,7 +21,7 @@ public class HttpTool {
     /**
      * 从网络Url中下载文件
      */
-    public static void downLoadFromUrl(final String downLoadUrl,final File file ,final HttpdwonLoadFail downLoadFail,final HttpDownLoadListener  listener) {
+    public static void downLoadFromUrl(final String downLoadUrl,final File file ,final HttpDownLoadListener  listener) {
         new Thread(new Runnable() {
 
             @Override
@@ -41,13 +41,13 @@ public class HttpTool {
                     FileOutputStream fos = new FileOutputStream(file);
                     fos.write(getData);
                     fos.close();
-                    listener.onFinish(file);
+                    listener.onSuccess(file);
                     if (inputStream != null) {
                         inputStream.close();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    downLoadFail.fail();
+                    listener.onFailure();
                     if (conn != null) {
                         conn.disconnect();
                     }
@@ -76,9 +76,8 @@ public class HttpTool {
 
 
     public interface HttpDownLoadListener {
-        void onFinish(File file);
+        void onSuccess(File file);
+        void onFailure();
     }
-    public interface HttpdwonLoadFail{
-        void fail();
-    }
+
 }

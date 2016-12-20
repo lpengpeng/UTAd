@@ -1,26 +1,23 @@
 package com.xian.utouu.addemo;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.xian.utouu.adlibrary.AdView;
-import com.xian.utouu.adlibrary.HttpTool;
-
-import static java.lang.Thread.sleep;
 
 public class AdActivity extends AppCompatActivity {
     private AdView myView;
     //gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
     private String videoUrl = "http://www.51hfzs.cn/123.mp4"; //视频的下载地址
     private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";
-    //图片的请求地址  先返回json 数据里面包含了链接
     private String imageUrl = "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg";
     // 视频和gif在SD卡中的目录
     private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo";
     private String url;
+    private String adUrl = "https://www.baidu.com/";
+    private int type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +29,10 @@ public class AdActivity extends AppCompatActivity {
     private void initView() {
         //调用接口返回url
         url = getIntent().getStringExtra("url");
+        type = getIntent().getIntExtra("type", 0);
 
         //获取控件
         myView = (AdView) findViewById(R.id.myView_main);
-
-        //设置跳转按钮
-        myView.goWhere(HomeActivity.class);
 
         //设置跳转按钮的背景
         myView.setJumpButtonBackgound(R.mipmap.jump);
@@ -59,35 +54,8 @@ public class AdActivity extends AppCompatActivity {
         });
         //设置默认的图片
         myView.showImage(R.mipmap.ic_launcher);
-        //设置广告本身的点击事件
-        myView.setMyImageClick(new AdView.MyAdClick() {
-            @Override
-            public void adClick() {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("https://www.baidu.com/"));
-                startActivity(i);
-                myView.cancelCountDownTimer();//取消掉倒计时的事件
-            }
-        });
-        myView.setTime(5000);//设置倒计时时间
-        //根据url显示加载哪种类型广高
-        myView.showView(this, sdpath, url, new HttpTool.HttpdwonLoadFail() {
-            @Override
-            public void fail() {
-                new Thread(new Runnable() {
-
-                    public void run() {
-                        try {
-                            sleep(2000);
-                            startActivity(new Intent(AdActivity.this, HomeActivity.class));
-                            finish();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-        });
+        //加载view
+        myView.showView(this, type, sdpath, url, adUrl,5000,HomeActivity.class);
 
     }
 

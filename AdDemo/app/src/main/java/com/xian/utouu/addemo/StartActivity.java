@@ -19,6 +19,8 @@ public class StartActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(StartActivity.this, AdActivity.class);
                 intent.putExtra("url", imageUrl);
+                intent.putExtra("type", 1);
+
                 startActivity(intent);
             }
         });
@@ -27,6 +29,7 @@ public class StartActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(StartActivity.this, AdActivity.class);
                 intent.putExtra("url",videoUrl);
+                intent.putExtra("type",3);
                 startActivity(intent);
             }
         });
@@ -35,6 +38,7 @@ public class StartActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(StartActivity.this, AdActivity.class);
                 intent.putExtra("url", gifUrl);
+                intent.putExtra("type",2);
                 startActivity(intent);
             }
         });
