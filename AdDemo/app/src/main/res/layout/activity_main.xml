@@ -5,9 +5,9 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.xian.utouu.aad.MainActivity">
+    tools:context=".MainActivity">
 
-    <com.xian.utouu.adlibrary.AdView
+    <cn.utsoft.commons.ADView.UTAdView
         android:id="@+id/myView_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
