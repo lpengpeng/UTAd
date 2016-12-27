@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -359,6 +360,11 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
             @Override
             public void loadSuccess(String s) {
                 try {
+                    if (TextUtils.isEmpty(s)){
+                        context.startActivity(new Intent(context, goActivity));
+                        myAdClick.AdClick();
+                        return;
+                    }
                     JSONObject jsonObject = new JSONObject(s);
                     boolean success = jsonObject.getBoolean("success");
                     if (success) {
