@@ -59,4 +59,10 @@ public class AdActivity extends AppCompatActivity {
         //加载view
         myView.initAdData(this, R.mipmap.ic_launcher, sdpath, "c29zp4mKTsGOfe638kbv5Q", "U-wL7_B2S6-gY-9zsggMuQ", 5000, HomeActivity.class);
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        myView.cancelCountDownTimer();
+    }
 }

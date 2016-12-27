@@ -47,8 +47,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     private String adUrl;
     private Class<?> goActivity;
     private MyAdClick myAdClick;
-    Handler handler = new Handler()
-    {
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
@@ -87,6 +86,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     public void setMyClick(MyCountdownClick myClick) {
         this.myClick = myClick;
     }
+
     /**
      * 设置跳过按钮的点击事件
      *
@@ -114,7 +114,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                     public void run() {
                         flImage.setVisibility(View.GONE);
                     }
-                }, 600);
+                }, 500);
             }
         });
     }
@@ -166,12 +166,14 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     public interface MyCountdownClick {
         void CountdownClick();
     }
+
     /**
      * 倒计时按钮的点击接口
      */
     public interface MyAdClick {
         void AdClick();
     }
+
     class MyCountDownTimer extends CountDownTimer {
         /**
          * @param millisInFuture    表示以毫秒为单位 倒计时的总数
@@ -265,7 +267,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
 
     /**
      * @param mActivity   显示图片的activity
-     * @param adtype        显示资源的类型
+     * @param adtype      显示资源的类型
      * @param sdpath      SD卡的路径
      * @param downLoadUrl 下载的链接
      * @param adUrl       广告的链接
@@ -275,7 +277,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     public void showView(final Activity mActivity, String adtype, String sdpath, final String downLoadUrl, String adUrl, final int time, final Class<?> goActivity) {
         this.adUrl = adUrl;
         String localUrl = "";
-       final  int type =Integer.parseInt(adtype);
+        final int type = Integer.parseInt(adtype);
         localUrl = getMd5String(downLoadUrl, type, localUrl);
         File localFile = new File(sdpath, localUrl);
         if (localFile.exists()) {
@@ -322,7 +324,6 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                         context.startActivity(new Intent(context, goActivity));
                         myAdClick.AdClick();
                     }
-
                 });
             }
         }
@@ -343,18 +344,16 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     /**
      * 获取应用数据
      */
-    public void initAdData(final Activity mActivity, int resId, final String sdpath,String APP_ID,String APP_KEY, final int time, final Class<?> goActivity) {
+    public void initAdData(final Activity mActivity, int resId, final String sdpath, String APP_ID, String APP_KEY, final int time, final Class<?> goActivity) {
         showImage(resId);
         this.goActivity = goActivity;
         this.sdpath = sdpath;
         this.time = time;
         this.mActivity = mActivity;
-
         final HashMap<String, String> map = new HashMap<>();
         map.put("client_id", APP_ID);
         map.put("client_secret", APP_KEY);
         map.put("grant_type", "client_advertise");
-
         UTHttpTool.getAdData("https://api.open.dev.utouu.com/v1/advertise/get", map, new UtLoadAdListener() {
 
             @Override
@@ -364,17 +363,14 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                     boolean success = jsonObject.getBoolean("success");
                     if (success) {
                         JSONObject data = jsonObject.getJSONObject("data");
-                        resource =   data.getString("resource");
+                        resource = data.getString("resource");
                         type = data.getString("type");
                         url = data.getString("url");
                         Message message =
                                 new Message();
-
                         message.what = 1;
                         handler.sendMessage(message);
-
                     }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
