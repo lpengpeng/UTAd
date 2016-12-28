@@ -11,15 +11,8 @@ import cn.utsoft.commons.ADView.UTAdView;
 
 public class AdActivity extends AppCompatActivity {
     private UTAdView myView;
-    //gif的下载地址, http://photo.l99.com/bigger/00/1425373097998_utt83i.gif
-    private String videoUrl = "http://www.51hfzs.cn/123.mp4"; //视频的下载地址
-    private String gifUrl = "http://photocdn.sohu.com/20150808/mp26389744_1439008079309_5.gif";
-    private String imageUrl = "http://4493bz.1985t.com/uploads/allimg/150127/4-15012G52133.jpg";
-    // 视频和gif在SD卡中的目录
+    // SD卡中的保存路径
     private String sdpath = Environment.getExternalStorageDirectory() + "/adVideo";
-    private String url;
-    private String adUrl = "https://www.baidu.com/";
-    private int type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
