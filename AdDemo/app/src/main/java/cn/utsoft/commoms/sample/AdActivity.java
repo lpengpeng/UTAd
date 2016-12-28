@@ -1,4 +1,4 @@
-package cn.utsoft.commoms.simple;
+package cn.utsoft.commoms.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -57,7 +57,7 @@ public class AdActivity extends AppCompatActivity {
             }
         });
         //加载view
-        myView.initAdData(this, R.mipmap.ic_launcher, sdpath, "c29zp4mKTsGOfe638kbv5Q", "U-wL7_B2S6-gY-9zsggMuQ", 5000, HomeActivity.class);
+        myView.initAdData(this, 0,R.mipmap.ic_launcher, sdpath, "c29zp4mKTsGOfe638kbv5Q", "U-wL7_B2S6-gY-9zsggMuQ", 5000, HomeActivity.class);
     }
 
     @Override

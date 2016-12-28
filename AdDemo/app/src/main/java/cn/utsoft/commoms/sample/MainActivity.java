@@ -1,4 +1,4 @@
-package cn.utsoft.commoms.simple;
+package cn.utsoft.commoms.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

@@ -1,4 +1,4 @@
-package cn.utsoft.commoms.simple;
+package cn.utsoft.commoms.sample;
 
 import android.content.Intent;
 import android.os.Bundle;

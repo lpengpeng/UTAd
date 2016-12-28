@@ -343,9 +343,17 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     }
 
     /**
-     * 获取应用数据
+     * 加载广告
+     * @param mActivity 上下文
+     * @param environment  环境
+     * @param resId 初始资源图片
+     * @param sdpath  内存卡路径
+     * @param APP_ID 应用appId
+     * @param APP_KEY 应用appKey
+     * @param time  倒计时时长
+     * @param goActivity 跳转到的主页面
      */
-    public void initAdData(final Activity mActivity, int resId, final String sdpath, String APP_ID, String APP_KEY, final int time, final Class<?> goActivity) {
+    public void initAdData(final Activity mActivity, int environment,int resId, final String sdpath, String APP_ID, String APP_KEY, final int time, final Class<?> goActivity) {
         showImage(resId);
         this.goActivity = goActivity;
         this.sdpath = sdpath;
@@ -355,7 +363,18 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
         map.put("client_id", APP_ID);
         map.put("client_secret", APP_KEY);
         map.put("grant_type", "client_advertise");
-        UTHttpTool.getAdData("https://api.open.dev.utouu.com/v1/advertise/get", map, new UtLoadAdListener() {
+        String adUrl="";
+        switch (environment){
+            case 0:
+                adUrl = "https://api.open.dev.utouu.com/v1/advertise/get";
+                break;
+            case 1:
+                adUrl = "https://api.open.test.utouu.com/v1/advertise/get";
+                break;
+            case 2:
+                break;
+        }
+        UTHttpTool.getAdData(adUrl, map, new UtLoadAdListener() {
 
             @Override
             public void loadSuccess(String s) {
