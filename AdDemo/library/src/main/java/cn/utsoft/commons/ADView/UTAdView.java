@@ -25,8 +25,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.HashMap;
 
-import cn.utsoft.commons.R;
-
 /**
  * Create by 李俊鹏 on 2016/12/7 9:43
  * Function：
