@@ -13,12 +13,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,7 +52,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
-                showView(mActivity, type, sdpath, resource, url, time, goActivity);
+                showView(mActivity, sdpath, resource, url, time, goActivity);
             }
         }
     };//不加这个分号则不能自动添加代码
@@ -58,7 +60,6 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     private String sdpath;
     private int time;
     private Activity mActivity;
-    private String type;
     private String resource;
 
     public UTAdView(Context context) {
@@ -266,26 +267,24 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
 
     /**
      * @param mActivity   显示图片的activity
-     * @param adtype      显示资源的类型
      * @param sdpath      SD卡的路径
      * @param downLoadUrl 下载的链接
      * @param adUrl       广告的链接
      * @param time        倒计时时间
      * @param goActivity  点击按钮后跳转到的界面
      */
-    public void showView(final Activity mActivity, String adtype, String sdpath, final String downLoadUrl, String adUrl, final int time, final Class<?> goActivity) {
+    public void showView(final Activity mActivity, String sdpath, final String downLoadUrl, String adUrl, final int time, final Class<?> goActivity) {
         this.adUrl = adUrl;
         String localUrl = "";
-        final int type = Integer.parseInt(adtype);
-        localUrl = getMd5String(downLoadUrl, type, localUrl);
+        localUrl = getMd5String(downLoadUrl, localUrl);
         File localFile = new File(sdpath, localUrl);
         if (localFile.exists()) {
             setProperty(time, false);
-            if (type == 2) {
+            if (downLoadUrl.endsWith(".gif")) {
                 showGif(localFile);//显示gif
-            } else if (type == 1) {
+            } else if (downLoadUrl.endsWith(".png") || downLoadUrl.endsWith(".jpg")) {
                 showImage(localFile);//显示图片
-            } else {
+            } else if (downLoadUrl.endsWith(".mp4") || downLoadUrl.endsWith(".3gp")) {
                 playVideo(localFile);//显示视频
             }
         } else {
@@ -296,7 +295,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                     file.mkdir();
                 }
                 String saveUrl = "";
-                saveUrl = getMd5String(downLoadUrl, type, saveUrl);
+                saveUrl = getMd5String(downLoadUrl, saveUrl);
                 File saveFile = new File(file, saveUrl);
                 //下载相应的广告
                 UTHttpTool.downLoadFromUrl(downLoadUrl, saveFile, new UTHttpTool.HttpDownLoadListener() {
@@ -307,11 +306,11 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                             public void run() {
                                 //设置倒计时的时间和是否显示几秒。false 为不显示
                                 setProperty(time, false);
-                                if (type == 2) {
+                                if (downLoadUrl.endsWith(".gif")) {
                                     showGif(file);//显示gif
-                                } else if (type == 1) {
+                                } else if (downLoadUrl.endsWith(".png") || downLoadUrl.endsWith(".jpg")) {
                                     showImage(file);//显示图片
-                                } else {
+                                } else if (downLoadUrl.endsWith(".mp4") || downLoadUrl.endsWith(".3gp")) {
                                     playVideo(file);//显示视频
                                 }
                             }
@@ -329,29 +328,34 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
     }
 
 
-    private String getMd5String(String downLoadUrl, int type, String saveUrl) {
-        if (type == 2) {
+    private String getMd5String(String downLoadUrl, String saveUrl) {
+        if (downLoadUrl.endsWith(".gif")) {
             saveUrl = UTMD5Util.md5(downLoadUrl) + ".gif";
-        } else if (type == 1) {
+        } else if (downLoadUrl.endsWith(".jpg")) {
             saveUrl = UTMD5Util.md5(downLoadUrl) + ".jpg";
-        } else if (type == 3) {
+        } else if (downLoadUrl.endsWith(".png")) {
+            saveUrl = UTMD5Util.md5(downLoadUrl) + ".png";
+        } else if (downLoadUrl.endsWith(".mp4")) {
             saveUrl = UTMD5Util.md5(downLoadUrl) + ".mp4";
+        } else if (downLoadUrl.endsWith(".3gp")) {
+            saveUrl = UTMD5Util.md5(downLoadUrl) + ".3gp";
         }
         return saveUrl;
     }
 
     /**
      * 加载广告
-     * @param mActivity 上下文
-     * @param environment  环境
-     * @param resId 初始资源图片
-     * @param sdpath  内存卡路径
-     * @param APP_ID 应用appId
-     * @param APP_KEY 应用appKey
-     * @param time  倒计时时长
-     * @param goActivity 跳转到的主页面
+     *
+     * @param mActivity   上下文
+     * @param environment 环境
+     * @param resId       初始资源图片
+     * @param sdpath      内存卡路径
+     * @param APP_ID      应用appId
+     * @param APP_KEY     应用appKey
+     * @param time        倒计时时长
+     * @param goActivity  跳转到的主页面
      */
-    public void initAdData(final Activity mActivity, int environment,int resId, final String sdpath, String APP_ID, String APP_KEY, final int time, final Class<?> goActivity) {
+    public void initAdData(final Activity mActivity, int environment, int resId, final String sdpath, String APP_ID, String APP_KEY, final int time, final Class<?> goActivity) {
         showImage(resId);
         this.goActivity = goActivity;
         this.sdpath = sdpath;
@@ -361,8 +365,8 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
         map.put("client_id", APP_ID);
         map.put("client_secret", APP_KEY);
         map.put("grant_type", "client_advertise");
-        String adUrl="";
-        switch (environment){
+        String adUrl = "";
+        switch (environment) {
             case 0:
                 adUrl = "https://api.open.dev.utouu.com/v1/advertise/get";
                 break;
@@ -377,7 +381,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
             @Override
             public void loadSuccess(String s) {
                 try {
-                    if (TextUtils.isEmpty(s)){
+                    if (TextUtils.isEmpty(s)) {
                         context.startActivity(new Intent(context, goActivity));
                         myAdClick.AdClick();
                         return;
@@ -386,11 +390,24 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                     boolean success = jsonObject.getBoolean("success");
                     if (success) {
                         JSONObject data = jsonObject.getJSONObject("data");
-                        resource = data.getString("resource");
-                        type = data.getString("type");
+                        DisplayMetrics dm = new DisplayMetrics();
+                        mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+                        float width = dm.widthPixels;
+                        JSONArray jsonArray = data.getJSONArray("resource");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject mObject = (JSONObject) jsonArray.get(i);
+                            String mSize = mObject.getString("size");
+                            if (width > 1080 && "3".equals(mSize)) {
+                                resource = mObject.getString("url");
+                            } else if (width >= 720 && width <= 1080 && "2".equals(mSize)) {
+                                resource = mObject.getString("url");
+                            } else if (width < 720 && "1".equals(mSize)) {
+                                resource = mObject.getString("url");
+                            }
+                        }
                         url = data.getString("url");
                         Message message =
-                                new Message();
+                                 new Message();
                         message.what = 1;
                         handler.sendMessage(message);
                     }
