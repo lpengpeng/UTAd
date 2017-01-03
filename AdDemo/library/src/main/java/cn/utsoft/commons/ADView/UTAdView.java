@@ -347,7 +347,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
      * 加载广告
      *
      * @param mActivity   上下文
-     * @param environment 环境
+     * @param environment 环境 0为开发环境 1为测试环境 2为正式环境
      * @param resId       初始资源图片
      * @param sdpath      内存卡路径
      * @param APP_ID      应用appId
@@ -374,6 +374,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                 adUrl = "https://api.open.test.utouu.com/v1/advertise/get";
                 break;
             case 2:
+                adUrl = "https://api.open.utouu.com/v1/advertise/get";
                 break;
         }
         UTHttpTool.getAdData(adUrl, map, new UtLoadAdListener() {
@@ -407,7 +408,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
                         }
                         url = data.getString("url");
                         Message message =
-                                 new Message();
+                                new Message();
                         message.what = 1;
                         handler.sendMessage(message);
                     }
