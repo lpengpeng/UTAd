@@ -248,7 +248,7 @@ public class UTAdView extends RelativeLayout implements View.OnClickListener {
      */
     public void showImage(int resId) {
         customeImageView.setVisibility(VISIBLE);
-        customeImageView.setBackgroundResource(resId);
+        customeImageView.setImageResource(resId);
         flVideoView.setVisibility(GONE);
         gif.setVisibility(GONE);
     }
