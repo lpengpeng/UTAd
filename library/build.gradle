@@ -30,3 +30,21 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.0.+'
 }
+/*afterEvaluate {
+    project ->
+        uploadArchives {
+            repositories.mavenDeployer {
+                repository(url: "http://nexus.dev.utouu.com/content/repositories/releases") {
+                    authentication(userName: USER_NAME, password: USER_PASS)
+                }
+                snapshotRepository(url: "http://nexus.dev.utouu.com/content/repositories/snapshots") {
+                    authentication(userName: USER_NAME, password: USER_PASS)
+                }
+                pom.version = "1.0.0"
+                pom.artifactId = "ad"
+                pom.groupId = "cn.utsoft"
+                pom.name = "sdk"
+                pom.packaging = 'aar'
+            }
+        }
+}*/
